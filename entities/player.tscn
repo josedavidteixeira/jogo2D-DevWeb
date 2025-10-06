@@ -120,12 +120,12 @@ shape = SubResource("CapsuleShape2D_u3f3p")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_i623q")
-animation = &"idie"
+animation = &"walk"
 autoplay = "idie"
 
 [node name="Camera2D" type="Camera2D" parent="."]
 limit_left = 7
 limit_top = 0
-limit_right = 453
+limit_right = 1000
 limit_bottom = 200
 position_smoothing_enabled = true
