@@ -1,15 +1,17 @@
-[gd_scene load_steps=24 format=3 uid="uid://dh8u1wnh6jkew"]
+[gd_scene load_steps=27 format=3 uid="uid://dh8u1wnh6jkew"]
 
 [ext_resource type="Script" uid="uid://bn61ef5lb2j0m" path="res://scripts/player.gd" id="1_merdl"]
 [ext_resource type="Texture2D" uid="uid://bfogb6ceorhwd" path="res://sprites/1 - Penguin/Idle (16 x 16).png" id="2_b0kkn"]
+[ext_resource type="Texture2D" uid="uid://beeletc7rbo3m" path="res://sprites/1 - Penguin/Hurt (16 x 16).png" id="2_i623q"]
 [ext_resource type="Texture2D" uid="uid://yqm80l67cpsn" path="res://sprites/1 - Penguin/Ducking (16 x 16).png" id="2_qly61"]
 [ext_resource type="Texture2D" uid="uid://n2v5ptgqycr8" path="res://sprites/1 - Penguin/Waddling (16 x 16).png" id="3_e4p34"]
+[ext_resource type="Texture2D" uid="uid://deqpxihyssk8n" path="res://sprites/1 - Penguin/Lying_On_Ground (16 x 16).png" id="3_ef06p"]
 [ext_resource type="Texture2D" uid="uid://cr5qk85rtwldm" path="res://sprites/1 - Penguin/Jump (16 x 16).png" id="3_rfe5m"]
 [ext_resource type="Texture2D" uid="uid://bhb7rchfahgvr" path="res://sprites/1 - Penguin/Belly_Sliding (16 x 16).png" id="5_qsoyl"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_u3f3p"]
-radius = 5.0
-height = 10.0
+radius = 7.0
+height = 14.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_e4p34"]
 atlas = ExtResource("2_b0kkn")
@@ -73,6 +75,17 @@ region = Rect2(80, 0, 16, 16)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_i623q"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_i623q")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_ef06p")
+}],
+"loop": false,
+"name": &"dead",
+"speed": 2.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": ExtResource("2_qly61")
@@ -147,16 +160,36 @@ animations = [{
 "speed": 10.0
 }]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qsoyl"]
+size = Vector2(11.5, 9.5)
+
 [node name="player" type="CharacterBody2D" groups=["player"]]
+collision_layer = 2
 script = ExtResource("1_merdl")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 z_index = 2
-position = Vector2(0, 3)
+position = Vector2(1, 1)
 shape = SubResource("CapsuleShape2D_u3f3p")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 z_index = 1
 sprite_frames = SubResource("SpriteFrames_i623q")
-animation = &"idle"
-frame_progress = 0.37361303
+animation = &"duck"
+
+[node name="Hitbox" type="Area2D" parent="."]
+z_index = 2
+collision_layer = 2
+collision_mask = 20
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(0.25, 2.75)
+shape = SubResource("RectangleShape2D_qsoyl")
+debug_color = Color(0.20059583, 0.5450627, 0.8960616, 0.41960785)
+
+[node name="ReloadTimer" type="Timer" parent="."]
+one_shot = true
+
+[connection signal="area_entered" from="Hitbox" to="." method="_on_hitbox_area_entered"]
+[connection signal="body_entered" from="Hitbox" to="." method="_on_hitbox_body_entered"]
+[connection signal="timeout" from="ReloadTimer" to="." method="_on_reload_timer_timeout"]

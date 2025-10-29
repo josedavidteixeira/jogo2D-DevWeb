@@ -5,11 +5,15 @@ enum playerstate{
 	walk,
 	jump,
 	duck,
-	slide
+	slide,
+	dead
 }
 
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
 @onready var collision_shape_2d: CollisionShape2D = $CollisionShape2D
+@onready var hitbox_collision_shape: CollisionShape2D = $Hitbox/CollisionShape2D
+@onready var reload_timer: Timer = $ReloadTimer
+
 
 @export var max_speed = 100.0
 @export var acceletration = 400
@@ -43,6 +47,8 @@ func _physics_process(delta: float) -> void:
 			duck_state(delta)
 		playerstate.slide:
 			slide_state(delta)
+		playerstate.dead:
+			dead_state(delta)
 	move_and_slide()
 
 func go_to_idle_state():
@@ -75,6 +81,15 @@ func go_to_slide_state():
 func exit_from_slide_state():
 	set_large_collider()
 	
+func go_to_dead_state():
+	if status ==playerstate.dead:
+		return
+		
+	status=playerstate.dead
+	anim.play("dead")
+	velocity.x =0
+	reload_timer.start()
+
 func idle_state(delta):
 	move(delta)
 	if velocity.x != 0:
@@ -137,6 +152,9 @@ func slide_state(delta):
 		exit_from_slide_state()
 		go_to_duck_state()
 		return
+		
+func dead_state(_delta):
+	pass
 
 func move(delta):
 	update_direction()
@@ -159,8 +177,42 @@ func set_small_collider():
 	collision_shape_2d.shape.height = 10
 	collision_shape_2d.position.y = 3
 	
+	
+	hitbox_collision_shape.shape.size.y = 10
+	hitbox_collision_shape.position.y = 3
+	
 func set_large_collider():
 	collision_shape_2d.shape.radius = 6
 	collision_shape_2d.shape.height = 16
 	collision_shape_2d.position.y = 0
 	
+	hitbox_collision_shape.shape.size.y = 15
+	hitbox_collision_shape.position.y = 0.5
+
+func _on_hitbox_area_entered(area: Area2D) -> void:
+	if area.is_in_group("Enemies"):
+		hit_enemy(area)
+	elif area.is_in_group("lethal_area"):
+		hit_lethal_area()
+		
+func _on_hitbox_body_entered(body: Node2D) -> void:
+	if body.is_in_group("lethal_area"):
+		go_to_dead_state()
+	
+func hit_enemy(area:Area2D):
+	if velocity.y > 0:
+		#inimigo morre
+		area.get_parent().take_damage()
+		go_to_jump_state()
+	else:
+		#player morre
+		
+			go_to_dead_state()
+			
+
+
+func hit_lethal_area():
+	go_to_dead_state()
+	
+func _on_reload_timer_timeout() -> void:
+	get_tree().reload_current_scene()
