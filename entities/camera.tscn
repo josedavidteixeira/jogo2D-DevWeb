@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://crpqn1qx5h8ra" path="res://scripts/camera.gd" id="1_ixxe8"]
 
 [node name="Camera" type="Camera2D"]
+position = Vector2(3, 3)
 limit_left = 0
 limit_bottom = 208
 position_smoothing_enabled = true

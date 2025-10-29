@@ -89,6 +89,8 @@ func go_to_dead_state():
 	anim.play("dead")
 	velocity.x =0
 	reload_timer.start()
+	
+	
 
 func idle_state(delta):
 	move(delta)
@@ -154,7 +156,8 @@ func slide_state(delta):
 		return
 		
 func dead_state(_delta):
-	pass
+	velocity.x = 0  # Garante que o player não se mexa
+	# Não troca de cena aqui mais
 
 func move(delta):
 	update_direction()
@@ -215,4 +218,4 @@ func hit_lethal_area():
 	go_to_dead_state()
 	
 func _on_reload_timer_timeout() -> void:
-	get_tree().reload_current_scene()
+	get_tree().change_scene_to_file("res://scene/game_over.tscn")
